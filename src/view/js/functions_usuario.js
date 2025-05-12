@@ -163,11 +163,11 @@ async function registrar_usuario() {
     let apellidos_nombres = document.querySelector('#apellidos_nombres').value;
     let correo = document.querySelector('#correo').value;
     let telefono = document.querySelector('#telefono').value;
-    if (dni == "" || apellidos_nombres == "" ||correo == "" || telefono == "") {
+    if (dni == "" || apellidos_nombres == "" || correo == "" || telefono == "") {
         Swal.fire({
             type: 'error',
             title: 'Error',
-            text: 'Campos vacíos...s',
+            text: 'Campos vacíos...',
             confirmButtonClass: 'btn btn-confirm mt-2',
             footer: ''
         })
