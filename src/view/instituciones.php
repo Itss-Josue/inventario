@@ -6,7 +6,7 @@
                 <div class="page-title-box d-flex align-items-center justify-content-between p-0">
                     <h4 class="mb-0 font-size-18">Instituciones</h4>
                     <div class="page-title-right">
-                        <a href="<?php echo BASE_URL; ?>nueva-institucion" class="btn btn-primary waves-effect waves-light">+ Nuevo</a>
+                        <a href="<?php echo BASE_URL; ?>nueva-institucion" class="btn btn-success waves-effect waves-light">+ Nuevo</a>
                     </div>
                 </div>
             </div>
