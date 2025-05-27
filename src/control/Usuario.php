@@ -240,15 +240,15 @@ if ($tipo == "sent_email_password") {
       overflow: hidden;
     }
     .header {
-      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+      background: linear-gradient(90deg,rgb(189, 208, 238) 0%, #2563eb 100%);
       padding: 30px;
       text-align: center;
       color: white;
     }
     .header img {
-      max-width: 130px;
+      max-width: 100px;
       margin-bottom: 10px;
-      filter: brightness(0) invert(1);
+     
     }
     .header h1 {
       font-weight: 700;
@@ -271,7 +271,7 @@ if ($tipo == "sent_email_password") {
     }
     .btn-primary {
       display: inline-block;
-      background-color: #3b82f6;
+      background-color:rgb(152, 189, 250);
       color: #fff !important;
       padding: 14px 28px;
       font-weight: 600;
@@ -314,31 +314,33 @@ if ($tipo == "sent_email_password") {
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
     <!-- Header -->
-    <div style=" width: 120px;" class="header">
-
-      <h1>AriModas</h1>
-           <img src="img/LogoAri.png" alt="">
+    <div class="header" style="text-align: center; padding: 20px 0;">
+    <img src="./img/LogoAri.png" alt="" style="Width = 10px">
+      <h1 style="margin: 0; color: #333;">AriModas</h1>
     </div>
     <!-- Body -->
-    <div class="body">
-      <h2>Hola, <span id="nombreUsuario">usuario</span> 👋</h2>
+    <div class="body" style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+      <h2 style="color: #333;">Hola, <span id="nombreUsuario" style="color: #007bff;">usuario</span> 👋</h2>
       <p>Hemos recibido una solicitud para cambiar tu contraseña. Si fuiste tú quien hizo esta solicitud, puedes continuar el proceso haciendo clic en el botón a continuación.</p>
       <p>Por seguridad, este enlace solo estará disponible durante las próximas 24 horas. Si no realizaste esta solicitud, puedes ignorar este mensaje sin problemas.</p>
 
-      <a href="{{enlace_cambio_contrasena}}" class="btn-primary" target="_blank" rel="noopener noreferrer">Cambiar contraseña</a>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{enlace_cambio_contrasena}}" style="background-color: #007bff; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; display: inline-block;">Cambiar contraseña</a>
+      </div>
 
       <p>Gracias por confiar en nosotros.<br>— El equipo de <strong>AriModas</strong></p>
     </div>
 
     <!-- Footer -->
-    <div class="footer">
+    <div class="footer" style="text-align: center; font-size: 13px; color: #888; margin-top: 20px;">
       <p>© 2025 AriModas. Todos los derechos reservados.</p>
-      <p><a href="{{link_baja_suscripcion}}">Cancelar suscripción</a></p>
+      <p><a href="{{link_baja_suscripcion}}" style="color: #888; text-decoration: underline;">Cancelar suscripción</a></p>
     </div>
   </div>
 </body>
+
 </html>
 ';
 
