@@ -204,29 +204,27 @@ if ($tipo == "sent_email_password") {
             $mail->isHTML(true);    
             $mail->CharSet = 'UTF-8';                              //Set email format to HTML
             $mail->Subject = 'Cambio de contraseña - Sistema de Inventario';
-            $mail->Body    = '
-            <!DOCTYPE html>
-<html lang="es" >
+            $mail->Body    = '<!DOCTYPE html>
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Correo Empresarial Moderno</title>
+  <title>Cambio de Contraseña - AriModas</title>
   <style>
-    /* Reset básico */
     body, p, div, h1, h2, h3, a {
       margin: 0;
       padding: 0;
-      font-family:  Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Tahoma, Geneva, Verdana, sans-serif;
       color: #444444;
-      line-height: 1.5;
+      line-height: 1.6;
     }
     body {
-      background-color: #f9fafc;
+      background-color: #f4f6f9;
       -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
     }
     a {
-      color: #3b82f6;
+      color: #2563eb;
       text-decoration: none;
     }
     a:hover {
@@ -234,38 +232,38 @@ if ($tipo == "sent_email_password") {
     }
     .container {
       max-width: 600px;
-      margin: 30px auto;
+      margin: 40px auto;
       background: #ffffff;
       border-radius: 12px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.07);
       border: 1px solid #e2e8f0;
+      overflow: hidden;
     }
     .header {
       background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-      padding: 25px 30px;
+      padding: 30px;
       text-align: center;
       color: white;
     }
     .header img {
-      max-width: 140px;
+      max-width: 130px;
       margin-bottom: 10px;
       filter: brightness(0) invert(1);
     }
     .header h1 {
       font-weight: 700;
       font-size: 24px;
-      letter-spacing: 1px;
+      margin-top: 10px;
     }
     .body {
-      padding: 30px 30px 40px;
+      padding: 35px 30px 40px;
       font-size: 16px;
       color: #555555;
     }
     .body h2 {
       font-weight: 600;
       font-size: 22px;
-      margin-bottom: 15px;
+      margin-bottom: 18px;
       color: #222222;
     }
     .body p {
@@ -279,13 +277,13 @@ if ($tipo == "sent_email_password") {
       font-weight: 600;
       border-radius: 8px;
       font-size: 16px;
-      margin: 20px 0;
+      margin: 25px 0;
       text-align: center;
       box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
       transition: background-color 0.3s ease;
     }
     .btn-primary:hover {
-      background-color: #2563eb;
+      background-color: #1d4ed8;
     }
     .footer {
       background-color: #f1f5f9;
@@ -298,7 +296,6 @@ if ($tipo == "sent_email_password") {
     .footer a {
       color: #3b82f6;
     }
-    /* Responsive */
     @media screen and (max-width: 620px) {
       .container {
         width: 95% !important;
@@ -306,7 +303,7 @@ if ($tipo == "sent_email_password") {
         border-radius: 8px;
       }
       .body {
-        padding: 20px 20px 30px;
+        padding: 25px 20px 30px;
         font-size: 15px;
       }
       .btn-primary {
@@ -319,32 +316,31 @@ if ($tipo == "sent_email_password") {
 <body>
   <div class="container">
     <!-- Header -->
-    <div class="header">
-      <img src="https://tuempresa.com/logo.png" alt="Logo Empresa" />
-      <h1>Nombre de tu Empresa</h1>
-    </div>
+    <div style=" width: 120px;" class="header">
 
+      <h1>AriModas</h1>
+           <img src="img/LogoAri.png" alt="">
+    </div>
     <!-- Body -->
     <div class="body">
-      <h2>Hola, {{nombre_cliente}} 👋</h2>
-      <p>Gracias por ser parte de nuestra comunidad. Queremos mantenerte informado sobre las últimas novedades, promociones exclusivas y contenido de valor para ti.</p>
-      <p>Explora nuestra web y descubre todo lo que tenemos preparado para ayudarte a crecer y mejorar cada día.</p>
+      <h2>Hola, <span id="nombreUsuario">usuario</span> 👋</h2>
+      <p>Hemos recibido una solicitud para cambiar tu contraseña. Si fuiste tú quien hizo esta solicitud, puedes continuar el proceso haciendo clic en el botón a continuación.</p>
+      <p>Por seguridad, este enlace solo estará disponible durante las próximas 24 horas. Si no realizaste esta solicitud, puedes ignorar este mensaje sin problemas.</p>
 
-      <a href="https://tuempresa.com" class="btn-primary" target="_blank" rel="noopener noreferrer">Visita nuestro sitio</a>
+      <a href="{{enlace_cambio_contrasena}}" class="btn-primary" target="_blank" rel="noopener noreferrer">Cambiar contraseña</a>
 
-      <p>Si tienes preguntas, estamos aquí para ayudarte. No dudes en contactarnos.</p>
-
-      <p>¡Un saludo cordial!<br />Equipo de <strong>Nombre de tu Empresa</strong></p>
+      <p>Gracias por confiar en nosotros.<br>— El equipo de <strong>AriModas</strong></p>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-      <p>© 2025 Nombre de tu Empresa. Todos los derechos reservados.</p>
+      <p>© 2025 AriModas. Todos los derechos reservados.</p>
       <p><a href="{{link_baja_suscripcion}}">Cancelar suscripción</a></p>
     </div>
   </div>
 </body>
-</html>';
+</html>
+';
 
             $mail->send();
             echo 'Message has been sent';

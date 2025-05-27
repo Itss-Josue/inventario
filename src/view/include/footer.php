@@ -13,6 +13,7 @@
                  <div class="col-md-6">
                      <div class="text-right d-none d-lg-block">
                          Desarrollado por GRUPO TINYH PERU S.A.C.
+                          
                      </div>
                  </div>
              </div>

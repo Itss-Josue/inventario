@@ -113,5 +113,4 @@ public function registrarUsuario($dni, $apellidos_nombres, $correo, $telefono, $
     }
 
 
-
 }
