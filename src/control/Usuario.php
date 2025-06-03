@@ -26,7 +26,28 @@ $objAdmin = new AdminModel();
 $id_sesion = $_POST['sesion'];
 $token = $_POST['token'];
 
+if ($tipo=="validar_datos_reset_password") {
+
+  $id_email = $_POST ['id'];
+  $token_email = $_POST ['token'];
+
+  $arr_Respuesta = array('status' => false, 'msg' => 'link caducado');
+  $datos_usuario = $objUsuario->buscarUsuarioById($id_email);
+
+  if ($datos_usuario->token_password==1 && password_verify($datos_usuario->token_password,$token_email)) {
+  $arr_Respuesta = array('status' => true, 'msg' => 'Ok');
+
+    echo json_encode($arr_Respuesta);
+  
+
+  }
+  
+}
+
+
+
 if ($tipo == "listar_usuarios_ordenados_tabla") {
+
     $arr_Respuesta = array('status' => false, 'msg' => 'Error_Sesion');
     if ($objSesion->verificar_sesion_si_activa($id_sesion, $token)) {
         //print_r($_POST);
@@ -63,6 +84,9 @@ if ($tipo == "listar_usuarios_ordenados_tabla") {
     }
     echo json_encode($arr_Respuesta);
 }
+
+
+
  if ($tipo == "registrar") {
     $arr_Respuesta = array('status' => false, 'msg' => 'Error_Sesion');
     if ($objSesion->verificar_sesion_si_activa($id_sesion, $token)) {
@@ -328,8 +352,8 @@ if ($tipo == "sent_email_password") {
       <p>Por seguridad, este enlace solo estará disponible durante las próximas 24 horas. Si no realizaste esta solicitud, puedes ignorar este mensaje sin problemas.</p>
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="{{enlace_cambio_contrasena}}" style="background-color: #007bff; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; display: inline-block;">Cambiar contraseña</a>
-      </div>
+        <a href="'.BASE_URL.'reset-password?data='.$datos_usuario->id.'&data2='.$token.'"class="button">Cambiar contraseña</a>
+      </div>  
 
       <p>Gracias por confiar en nosotros.<br>— El equipo de <strong>AriModas</strong></p>
     </div>
