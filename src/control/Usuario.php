@@ -318,7 +318,7 @@ if ($tipo == "sent_email_password") {
   <div class="container" style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
     <!-- Header -->
     <div class="header" style="text-align: center; padding: 20px 0;">
-    <img src="./img/LogoAri.png" alt="" style="Width = 10px">
+   <img src="https://drive.google.com/uc?export=dowload&id=1zMqvObW5v16DEPqAdJO-M6QeHa9Oh3Wk" alt="Logo AriModas" style="width: 100px;">
       <h1 style="margin: 0; color: #333;">AriModas</h1>
     </div>
     <!-- Body -->
