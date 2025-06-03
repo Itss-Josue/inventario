@@ -162,6 +162,7 @@ if ($tipo == "sent_email_password") {
     if ($objSesion->verificar_sesion_si_activa($id_sesion, $token)) {   
         $datos_sesion = $objSesion->buscarSesionLoginById($id_sesion);
         $datos_usuario = $objUsuario->buscarUsuarioById($datos_sesion->id_usuario);
+        $nombreusuario = $datos_usuario->nombres_apellidos;
         $llave = $objAdmin->generar_llave(30);
         $token = password_hash($llave, PASSWORD_DEFAULT);
         $update = $objUsuario->updateResetPassword($datos_sesion->id_usuario, $llave , 1);
@@ -322,7 +323,7 @@ if ($tipo == "sent_email_password") {
     </div>
     <!-- Body -->
     <div class="body" style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
-      <h2 style="color: #333;">Hola, <span id="nombreUsuario" style="color: #007bff;">usuario</span> 👋</h2>
+      <h2 >Hola, '.$nombreusuario.' 👋</h2>
       <p>Hemos recibido una solicitud para cambiar tu contraseña. Si fuiste tú quien hizo esta solicitud, puedes continuar el proceso haciendo clic en el botón a continuación.</p>
       <p>Por seguridad, este enlace solo estará disponible durante las próximas 24 horas. Si no realizaste esta solicitud, puedes ignorar este mensaje sin problemas.</p>
 
@@ -336,7 +337,6 @@ if ($tipo == "sent_email_password") {
     <!-- Footer -->
     <div class="footer" style="text-align: center; font-size: 13px; color: #888; margin-top: 20px;">
       <p>© 2025 AriModas. Todos los derechos reservados.</p>
-      <p><a href="{{link_baja_suscripcion}}" style="color: #888; text-decoration: underline;">Cancelar suscripción</a></p>
     </div>
   </div>
 </body>
