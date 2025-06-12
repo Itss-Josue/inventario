@@ -34,7 +34,7 @@ if ($tipo=="validar_datos_reset_password") {
   $arr_Respuesta = array('status' => false, 'msg' => 'link caducado');
   $datos_usuario = $objUsuario->buscarUsuarioById($id_email);
 
-  if ($datos_usuario->token_password==1 && password_verify($datos_usuario->token_password,$token_email)) {
+  if ($datos_usuario->reset_password==1 && password_verify($datos_usuario->token_password,$token_email)) {
   $arr_Respuesta = array('status' => true, 'msg' => 'Ok');
 
     echo json_encode($arr_Respuesta);
@@ -352,7 +352,7 @@ if ($tipo == "sent_email_password") {
       <p>Por seguridad, este enlace solo estará disponible durante las próximas 24 horas. Si no realizaste esta solicitud, puedes ignorar este mensaje sin problemas.</p>
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="'.BASE_URL.'reset-password?data='.$datos_usuario->id.'&data2='.$token.'"class="button">Cambiar contraseña</a>
+        <a href="'.BASE_URL.'reset-password?data='.$datos_usuario->id.'&data2='.$token. urldecode($token).'"class="button">Cambiar contraseña</a>
       </div>  
 
       <p>Gracias por confiar en nosotros.<br>— El equipo de <strong>AriModas</strong></p>

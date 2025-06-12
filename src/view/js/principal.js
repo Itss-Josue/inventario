@@ -164,6 +164,8 @@ function cargar_sede_filtro(sedes) {
     });
     document.getElementById('busqueda_tabla_sede').innerHTML = lista_sede;
 }
+
+
 async function validar_datos_reset_password() {
     let id = document.getElementById('data').value;
     let token = document.getElementById('data2').value;
@@ -171,6 +173,7 @@ async function validar_datos_reset_password() {
      const formData = new FormData();
     formData.append('id', id);
     formData.append('token', token);
+    formData.append('sesion', '');
 
     try {
         let respuesta = await fetch(base_url_server+ 'src/control/Usuario.php?tipo=validar_datos_reset_password', {
