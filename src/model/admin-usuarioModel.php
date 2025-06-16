@@ -10,7 +10,8 @@ class UsuarioModel
         $this->conexion = new Conexion();
         $this->conexion = $this->conexion->connect();
     }
-public function registrarUsuario($dni, $apellidos_nombres, $correo, $telefono, $password)
+    
+    public function registrarUsuario($dni, $apellidos_nombres, $correo, $telefono, $password)
     {
         $password_secure = password_hash($password, PASSWORD_DEFAULT); // Hash de la contraseña
         $sql = $this->conexion->query("INSERT INTO usuarios (dni, nombres_apellidos, correo, telefono, password) VALUES ('$dni','$apellidos_nombres','$correo','$telefono', '$password_secure')");
@@ -22,20 +23,28 @@ public function registrarUsuario($dni, $apellidos_nombres, $correo, $telefono, $
         return $sql;
     }
 
-
     public function actualizarUsuario($id, $dni, $nombres_apellidos, $correo, $telefono, $estado)
     {
         $sql = $this->conexion->query("UPDATE usuarios SET dni='$dni',nombres_apellidos='$nombres_apellidos',correo='$correo',telefono='$telefono',estado ='$estado' WHERE id='$id'");
         return $sql;
     }
+    
     public function actualizarPassword($id, $password)
     {
-        $sql = $this->conexion->query("UPDATE usuarios SET password ='$password' WHERE id='$id'");
+        $password_secure = password_hash($password, PASSWORD_DEFAULT); // Hash de la contraseña
+        $sql = $this->conexion->query("UPDATE usuarios SET password ='$password_secure' WHERE id='$id'");
+        return $sql;
+    }
+
+    // NUEVO MÉTODO: Actualizar contraseña y resetear campos de recuperación
+    public function actualizarPasswordYResetearToken($id, $password)
+    {
+        $password_secure = password_hash($password, PASSWORD_DEFAULT); // Hash de la contraseña
+        $sql = $this->conexion->query("UPDATE usuarios SET password='$password_secure', reset_password='0', token_password='' WHERE id='$id'");
         return $sql;
     }
 
     public function updateResetPassword($id, $token, $estado){
-
         $sql = $this->conexion->query("UPDATE usuarios SET token_password ='$token', reset_password='$estado' WHERE id='$id'");
         return $sql;
     }
@@ -46,30 +55,35 @@ public function registrarUsuario($dni, $apellidos_nombres, $correo, $telefono, $
         $sql = $sql->fetch_object();
         return $sql;
     }
+    
     public function buscarUsuarioByDni($dni)
     {
         $sql = $this->conexion->query("SELECT * FROM usuarios WHERE dni='$dni'");
         $sql = $sql->fetch_object();
         return $sql;
     }
+    
     public function buscarUsuarioByNomAp($nomap)
     {
         $sql = $this->conexion->query("SELECT * FROM usuarios WHERE nombres_apellidos='$nomap'");
         $sql = $sql->fetch_object();
         return $sql;
     }
+    
     public function buscarUsuarioByApellidosNombres_like($dato)
     {
         $sql = $this->conexion->query("SELECT * FROM usuarios WHERE nombres_apellidos LIKE '%$dato%'");
         $sql = $sql->fetch_object();
         return $sql;
     }
+    
     public function buscarUsuarioByDniCorreo($dni, $correo)
     {
         $sql = $this->conexion->query("SELECT * FROM usuarios WHERE dni='$dni' AND correo='$correo'");
         $sql = $sql->fetch_object();
         return $sql;
     }
+    
     public function buscarUsuariosOrdenados()
     {
         $arrRespuesta = array();
@@ -95,6 +109,7 @@ public function registrarUsuario($dni, $apellidos_nombres, $correo, $telefono, $
         }
         return $arrRespuesta;
     }
+    
     public function buscarUsuariosOrderByApellidosNombres_tabla($pagina, $cantidad_mostrar, $busqueda_tabla_dni, $busqueda_tabla_nomap, $busqueda_tabla_estado)
     {
         //condicionales para busqueda
@@ -111,6 +126,4 @@ public function registrarUsuario($dni, $apellidos_nombres, $correo, $telefono, $
         }
         return $arrRespuesta;
     }
-
-
 }

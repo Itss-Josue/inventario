@@ -4,7 +4,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-
 session_start();
 require_once('../model/admin-sesionModel.php');
 require_once('../model/admin-usuarioModel.php');
@@ -16,7 +15,6 @@ require '../../vendor/phpmailer/phpmailer/src/SMTP.php';
 
 $tipo = $_GET['tipo'];
 
-
 //instanciar la clase categoria model
 $objSesion = new SessionModel();
 $objUsuario = new UsuarioModel();
@@ -26,22 +24,71 @@ $objAdmin = new AdminModel();
 $id_sesion = $_POST['sesion'];
 $token = $_POST['token'];
 
-if ($tipo=="validar_datos_reset_password") {
+if ($tipo == "validar_datos_reset_password") {
+    $id_email = $_POST['id'];
+    $token_email = $_POST['token'];
 
-  $id_email = $_POST ['id'];
-  $token_email = $_POST ['token'];
+    $arr_Respuesta = array('status' => false, 'msg' => 'link caducado');
+    $datos_usuario = $objUsuario->buscarUsuarioById($id_email);
 
-  $arr_Respuesta = array('status' => false, 'msg' => 'link caducado');
-  $datos_usuario = $objUsuario->buscarUsuarioById($id_email);
-
-  if ($datos_usuario->reset_password==1 && password_verify($datos_usuario->token_password,$token_email)) {
-  $arr_Respuesta = array('status' => true, 'msg' => 'Ok');
-
+    if ($datos_usuario && $datos_usuario->reset_password == 1 && password_verify($datos_usuario->token_password, $token_email)) {
+        $arr_Respuesta = array('status' => true, 'msg' => 'Ok');
+    }
+    
     echo json_encode($arr_Respuesta);
-  
+}
 
-  }
-  
+// NUEVA FUNCIONALIDAD: Actualizar contraseña del reseteo
+if ($tipo == "actualizar_password_reset") {
+    try {
+        $id_usuario = $_POST['id'];
+        $token_recibido = $_POST['token'];
+        $nueva_password = $_POST['password'];
+
+        // Validar que se recibieron todos los datos necesarios
+        if (empty($id_usuario) || empty($token_recibido) || empty($nueva_password)) {
+            throw new Exception("Datos incompletos");
+        }
+
+        // Buscar usuario por ID
+        $datos_usuario = $objUsuario->buscarUsuarioById($id_usuario);
+        
+        if (!$datos_usuario) {
+            throw new Exception("Usuario no encontrado");
+        }
+
+        // Verificar que el token es válido y el usuario está en proceso de reset
+        if ($datos_usuario->reset_password != 1 || !password_verify($datos_usuario->token_password, $token_recibido)) {
+            throw new Exception("Token inválido o expirado");
+        }
+
+        // Validar longitud de contraseña
+        if (strlen($nueva_password) < 8) {
+            throw new Exception("La contraseña debe tener mínimo 8 caracteres");
+        }
+
+        // Actualizar contraseña y resetear campos de recuperación
+        $resultado = $objUsuario->actualizarPasswordYResetearToken($id_usuario, $nueva_password);
+
+        if ($resultado) {
+            $arr_Respuesta = array(
+                'status' => true,
+                'mensaje' => 'Contraseña actualizada correctamente'
+            );
+        } else {
+            throw new Exception("Error al actualizar la contraseña en la base de datos");
+        }
+
+    } catch (Exception $e) {
+        $arr_Respuesta = array(
+            'status' => false,
+            'mensaje' => $e->getMessage()
+        );
+    }
+
+    // Enviar respuesta JSON
+    header('Content-Type: application/json');
+    echo json_encode($arr_Respuesta);
 }
 
 
