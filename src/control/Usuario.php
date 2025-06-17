@@ -38,59 +38,40 @@ if ($tipo == "validar_datos_reset_password") {
     echo json_encode($arr_Respuesta);
 }
 
-// NUEVA FUNCIONALIDAD: Actualizar contraseña del reseteo
 if ($tipo == "actualizar_password_reset") {
-    try {
-        $id_usuario = $_POST['id'];
-        $token_recibido = $_POST['token'];
-        $nueva_password = $_POST['password'];
-
-        // Validar que se recibieron todos los datos necesarios
-        if (empty($id_usuario) || empty($token_recibido) || empty($nueva_password)) {
-            throw new Exception("Datos incompletos");
-        }
-
-        // Buscar usuario por ID
-        $datos_usuario = $objUsuario->buscarUsuarioById($id_usuario);
+    $id_usuario = $_POST['id'];
+    $nueva_password = $_POST['password'];
+    $token_email = $_POST['token'];
+    
+    $arr_Respuesta = array('status' => false, 'msg' => 'Error al actualizar contraseña');
+    
+    // Verificar que el usuario existe y el token es válido
+    $datos_usuario = $objUsuario->buscarUsuarioById($id_usuario);
+    
+    if ($datos_usuario && $datos_usuario->reset_password == 1 && password_verify($datos_usuario->token_password, $token_email)) {
+        // Actualizar contraseña y limpiar datos de reset
+        $resultado = $objUsuario->actualizarPasswordYLimpiarReset($id_usuario, $nueva_password);
         
-        if (!$datos_usuario) {
-            throw new Exception("Usuario no encontrado");
-        }
-
-        // Verificar que el token es válido y el usuario está en proceso de reset
-        if ($datos_usuario->reset_password != 1 || !password_verify($datos_usuario->token_password, $token_recibido)) {
-            throw new Exception("Token inválido o expirado");
-        }
-
-        // Validar longitud de contraseña
-        if (strlen($nueva_password) < 8) {
-            throw new Exception("La contraseña debe tener mínimo 8 caracteres");
-        }
-
-        // Actualizar contraseña y resetear campos de recuperación
-        $resultado = $objUsuario->actualizarPasswordYResetearToken($id_usuario, $nueva_password);
-
         if ($resultado) {
             $arr_Respuesta = array(
-                'status' => true,
-                'mensaje' => 'Contraseña actualizada correctamente'
+                'status' => true, 
+                'msg' => 'Contraseña actualizada correctamente'
             );
         } else {
-            throw new Exception("Error al actualizar la contraseña en la base de datos");
+            $arr_Respuesta = array(
+                'status' => false, 
+                'msg' => 'Error al guardar en la base de datos'
+            );
         }
-
-    } catch (Exception $e) {
+    } else {
         $arr_Respuesta = array(
-            'status' => false,
-            'mensaje' => $e->getMessage()
+            'status' => false, 
+            'msg' => 'Token inválido o expirado'
         );
     }
-
-    // Enviar respuesta JSON
-    header('Content-Type: application/json');
+    
     echo json_encode($arr_Respuesta);
 }
-
 
 
 if ($tipo == "listar_usuarios_ordenados_tabla") {
@@ -312,7 +293,7 @@ if ($tipo == "sent_email_password") {
       overflow: hidden;
     }
     .header {
-      background: linear-gradient(90deg,rgb(189, 208, 238) 0%, #2563eb 100%);
+      background: linear-gradient(90deg,rgb(243, 243, 243) 0%, #2563eb 100%);
       padding: 30px;
       text-align: center;
       color: white;
@@ -399,7 +380,7 @@ if ($tipo == "sent_email_password") {
       <p>Por seguridad, este enlace solo estará disponible durante las próximas 24 horas. Si no realizaste esta solicitud, puedes ignorar este mensaje sin problemas.</p>
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="'.BASE_URL.'reset-password?data='.$datos_usuario->id.'&data2='.$token. urldecode($token).'"class="button">Cambiar contraseña</a>
+        <a href="' . BASE_URL . 'reset-password/?data=' . $datos_usuario->id . '&data2=' . urlencode($token) . '" class="button">cambiar contraseña </a>
       </div>  
 
       <p>Gracias por confiar en nosotros.<br>— El equipo de <strong>AriModas</strong></p>

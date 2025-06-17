@@ -13,18 +13,18 @@
       align-items: center;
       min-height: 100vh;
       font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg,rgb(208, 208, 208), #88d3ce);
+      background: linear-gradient(135deg, #2563eb, #88d3ce);
       color: #fff;
     }
 
     .login-container {
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 40px 30px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      padding: 45px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       text-align: center;
-      width: 300px;
+      width: 320px;
     }
 
     .login-container h1 {
@@ -33,47 +33,54 @@
       color: #fff;
     }
 
+    .login-container h4 {
+      margin-bottom: 20px;
+      font-size: 1rem;
+      color: #f0f0f0;
+    }
+
     .login-container input {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin: 10px 0;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       outline: none;
       font-size: 1rem;
     }
 
     .login-container input[type="email"],
     .login-container input[type="password"] {
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       color: #333;
     }
 
     .login-container input::placeholder {
-      color: #888;
+      color: #777;
     }
 
     .login-container button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 20px;
-      background:rgb(214, 214, 214);
+      background: #38bdf8;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       color: #fff;
       font-size: 1rem;
+      font-weight: bold;
       cursor: pointer;
-      transition:background 0.3s ease;
+      transition: background 0.3s ease;
     }
 
     .login-container button:hover {
-      background: #88d3ce;
+      background: #0ea5e9;
     }
 
     .login-container a {
       display: block;
       margin-top: 15px;
-      color: #fff;
+      color: #e0f2fe;
       text-decoration: none;
       font-size: 0.9rem;
     }
@@ -91,26 +98,24 @@
 </head>
 
 <body>
-    <input type="hidden" id="data" value='<?php echo $_GET['data'];?>'>
-    <input type="hidden" id="data2" value='<?php echo urldecode($_GET['data2']);?>'>
+  <input type="hidden" id="data" value='<?php echo $_GET['data'];?>'>
+  <input type="hidden" id="data2" value='<?php echo urldecode($_GET['data2']);?>'>
   <div class="login-container" id="logincontainer">
-    <h1>recuperar contraseña </h1>
+    <h1>recuperar contraseña</h1>
     <img src="https://sispa.iestphuanta.edu.pe/img/logo.png" alt="" width="100%">
     <h4>Sistema de Control de Inventario</h4>
     <form id="frm_reset_password">
       <input type="password" name="password" id="password" placeholder=" nueva Contraseña" required>
       <input type="password" name="password" id="password1" placeholder=" confirmar Contraseña" required>
-      <button type="button" onclick="validar_imputs_password();" >actualizar contraseña</button>
+      <button type="button" onclick="validar_imputs_password();">actualizar contraseña</button>
     </form>
   </div>
 </body>
 <script src="<?php echo BASE_URL; ?>src/view/js/principal.js"></script>
 <script>
-validar_datos_reset_password();
-
+  validar_datos_reset_password();
 </script>
 
 <!-- Sweet Alerts Js-->
 <script src="<?php echo BASE_URL ?>src/view/pp/plugins/sweetalert2/sweetalert2.min.js"></script>
-
 </html>
