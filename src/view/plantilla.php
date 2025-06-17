@@ -58,8 +58,11 @@ if (isset($_SESSION['sesion_id']) && isset($_SESSION['sesion_token'])) {
 if ($vista == "login" || $vista == "404" || $vista == "reset-password") {
     require_once "./src/view/" . $vista . ".php";
 } else {
-
-    include "./src/view/include/header.php";
+    if ($vista != './src/view/imprimir-movimiento.php') {
+       include "./src/view/include/header.php";
+    }
     include $vista;
-    include "./src/view/include/footer.php";
+    if ($vista != './src/view/imprimir-movimiento.php') {
+       include "./src/view/include/footer.php";
+    } 
 }

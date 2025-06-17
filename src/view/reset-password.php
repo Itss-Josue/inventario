@@ -84,7 +84,6 @@
       text-decoration: none;
       font-size: 0.9rem;
     }
-
     .login-container a:hover {
       text-decoration: underline;
     }
@@ -101,9 +100,8 @@
   <input type="hidden" id="data" value='<?php echo $_GET['data'];?>'>
   <input type="hidden" id="data2" value='<?php echo urldecode($_GET['data2']);?>'>
   <div class="login-container" id="logincontainer">
-    <h1>recuperar contraseña</h1>
-    <img src="https://sispa.iestphuanta.edu.pe/img/logo.png" alt="" width="100%">
-    <h4>Sistema de Control de Inventario</h4>
+    <h1>Actualizar Contraseña</h1>
+    <h4>AriModas | Cambia tu Contraseña</h4>
     <form id="frm_reset_password">
       <input type="password" name="password" id="password" placeholder=" nueva Contraseña" required>
       <input type="password" name="password" id="password1" placeholder=" confirmar Contraseña" required>
