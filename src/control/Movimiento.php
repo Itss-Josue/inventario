@@ -217,6 +217,9 @@ if ($tipo== "buscar_movimiento_id") {
         $arrIes= $objInstitucion->buscarInstitucionById($arrMovimiento->id_ies);
         $arrDetalle= $objMovimiento->buscarDetalle_MovimientoByMovimiento($id_movimiento);
         $array_bienes = array();
+        //ya creado un array, ahora se tiene qu hacer el objeto$res_bien se tiene que agregar a arraybienes:
+        // este array quiero que le envies dentro de array respuesta hacia la vista,
+        //el objeto tiene que mostrarme todos los objetos de la base de datos.
         foreach ($variable as $bien) { 
             $id_bien = $bien_id_bien;
             $res_bien = $objBien->buscarBienById($id_bien);
