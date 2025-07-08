@@ -192,6 +192,19 @@ foreach ($respuesta->detalle as $bien) {
     <?php
 
     require_once('./vendor/tecnickcom/tcpdf/tcpdf.php');
-    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true,'', false);
+    $pdf = new TCPDF();
+    $pdf->setCreator(PDF_CREATOR);
+    $pdf->setAuthor('GOMEZ');
+    $pdf->setTitle('Reporte de Movimientos');
+
+
+    // set margins
+$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+// set auto page breaks
+$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
 
     }
