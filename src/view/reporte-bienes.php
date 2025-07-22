@@ -8,13 +8,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $spreadsheet = new Spreadsheet();
 $spreadsheet->getProperties()->setCreator("")->setLastModifiedBy("yo")->setTitle("yo")->setDescription("yo");
 $activeWorksheet = $spreadsheet->getActiveSheet();
-$activeWorksheet->setTitle("hoja1");
-$activeWorksheet->setCellValue('A1', 'Hola Mundo !');
-$activeWorksheet->setCellValue('A2', 'DNI');
-$activeWorksheet->setCellValue('B2', '77654567');
-$activeWorksheet->setCellValue('A3', 'nombre');
-$activeWorksheet->setCellValue('B3', 'yanet');
-
 
 
 $curl = curl_init(); 
@@ -46,7 +39,7 @@ $curl = curl_init();
        $bienes = $respuesta->bienes;
 
             $spreadsheet = new Spreadsheet();
-            $spreadsheet->getProperties()->setCreator("Jasmina")->setLastModifiedBy("yo")->setTitle("ReporteBienes")->setDescription("yo");
+            $spreadsheet->getProperties()->setCreator("Gomez")->setLastModifiedBy("yo")->setTitle("ReporteBienes")->setDescription("yo");
             $activeWorkSheet = $spreadsheet->getActiveSheet();
             $activeWorkSheet->setTitle("Bienes");  
             $styleArray = [
