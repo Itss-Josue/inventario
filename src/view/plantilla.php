@@ -4,13 +4,9 @@ require_once "./src/config/config.php";
 require_once "./src/control/vistas_control.php";
 
 
+
 $mostrar = new vistasControlador();
 $vista = $mostrar->obtenerVistaControlador();
-
-$reset='';
-if($vista=="reset-password"){
-    $reset="reset-password";
-}
 
 
 if (isset($_SESSION['sesion_id']) && isset($_SESSION['sesion_token'])) {
@@ -50,19 +46,15 @@ if (isset($_SESSION['sesion_id']) && isset($_SESSION['sesion_token'])) {
     }
 }
 
-    if($reset == "reset-password"){
-        $vista = "reset-password";
-    }
 
-
-if ($vista == "login" || $vista == "404" || $vista == "reset-password") {
+if ($vista == "login" || $vista == "404" ||$vista == "UpdatePassword" ) {
     require_once "./src/view/" . $vista . ".php";
 } else {
-    if ($vista != './src/view/imprimir-movimiento.php' && $vista != './src/view/reporte-bienes.php') {
+   if($vista != "./src/view/imprimir-movimiento.php" && $vista != "./src/view/reporte-bienes.php" && $vista != "./src/view/imprimir-pdfs.php"){
        include "./src/view/include/header.php";
     }
     include $vista;
-    if ($vista != './src/view/imprimir-movimiento.php' && $vista != './src/view/reporte-bienes.php') {
+      if($vista != "./src/view/imprimir-movimiento.php" && $vista != "./src/view/reporte-bienes.php" && $vista != "./src/view/imprimir-pdfs.php"){
        include "./src/view/include/footer.php";
     } 
 }

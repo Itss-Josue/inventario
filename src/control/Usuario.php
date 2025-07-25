@@ -8,10 +8,7 @@ session_start();
 require_once('../model/admin-sesionModel.php');
 require_once('../model/admin-usuarioModel.php');
 require_once('../model/adminModel.php');
-
-require '../../vendor/phpmailer/phpmailer/src/Exception.php';
-require '../../vendor/phpmailer/phpmailer/src/PHPMailer.php';
-require '../../vendor/phpmailer/phpmailer/src/SMTP.php';
+require  '../../vendor/autoload.php' ;
 
 $tipo = $_GET['tipo'];
 
@@ -21,61 +18,58 @@ $objUsuario = new UsuarioModel();
 $objAdmin = new AdminModel();
 
 //variables de sesion
-$id_sesion = $_POST['sesion'];
-$token = $_POST['token'];
+$id_sesion = $_REQUEST['sesion'];
+$token = $_REQUEST['token'];
 
-if ($tipo == "validar_datos_reset_password") {
-    $id_email = $_POST['id'];
-    $token_email = $_POST['token'];
+//falta
+if($tipo == "restablecer_password"){
 
-    $arr_Respuesta = array('status' => false, 'msg' => 'link caducado');
-    $datos_usuario = $objUsuario->buscarUsuarioById($id_email);
+        $arr_Respuesta = array('status' => false, 'msg' => 'Error al restablecer');
 
-    if ($datos_usuario && $datos_usuario->reset_password == 1 && password_verify($datos_usuario->token_password, $token_email)) {
-        $arr_Respuesta = array('status' => true, 'msg' => 'Ok');
-    }
-    
-    echo json_encode($arr_Respuesta);
-}
+        if ($_POST) {
+            $id = $_POST['id'];
+            $NewPassword = $_POST['password'];
+            $hashedPassword = password_hash($NewPassword, PASSWORD_DEFAULT);
 
-if ($tipo == "actualizar_password_reset") {
-    $id_usuario = $_POST['id'];
-    $nueva_password = $_POST['password'];
-    $token_email = $_POST['token'];
-    
-    $arr_Respuesta = array('status' => false, 'msg' => 'Error al actualizar contraseña');
-    
-    // Verificar que el usuario existe y el token es válido
-    $datos_usuario = $objUsuario->buscarUsuarioById($id_usuario);
-    
-    if ($datos_usuario && $datos_usuario->reset_password == 1 && password_verify($datos_usuario->token_password, $token_email)) {
-        // Actualizar contraseña y limpiar datos de reset
-        $resultado = $objUsuario->actualizarPasswordYLimpiarReset($id_usuario, $nueva_password);
-        
-        if ($resultado) {
-            $arr_Respuesta = array(
-                'status' => true, 
-                'msg' => 'Contraseña actualizada correctamente'
-            );
-        } else {
-            $arr_Respuesta = array(
-                'status' => false, 
-                'msg' => 'Error al guardar en la base de datos'
-            );
+            if ($id == "" || $NewPassword == "") {
+                $arr_Respuesta = array('status' => false, 'mensaje' => 'Error, campos vacíos');
+            } else {
+                //validar si existe el usuario con ese id
+                $arr_Usuario = $objUsuario->buscarUsuarioById($id);
+                if ($arr_Usuario){
+                    $operacion = $objUsuario->actualizarPassword($id, $hashedPassword);
+                    if ($operacion) {
+                        $tokenVacio = "";
+                        $nuevoEstado = 0;
+                        $operacion2 = $objUsuario->UpdateResetPassword($id, $tokenVacio, $nuevoEstado);
+                        if (!$operacion2) {
+                           $arr_Respuesta = array('status' => false, 'mensaje' => 'Error al limpiar token');
+                        }
+                        $arr_Respuesta = array('status' => true, 'mensaje' => 'Actualizado correctamente');
+                    } else {
+                        $arr_Respuesta = array('status' => false, 'mensaje' => 'Fallo al actualizar');
+                    }
+                    
+                } else {
+                   $arr_Respuesta = array('status' => false, 'mensaje' => 'Error, usuario no existe');
+                }
+            }
         }
-    } else {
-        $arr_Respuesta = array(
-            'status' => false, 
-            'msg' => 'Token inválido o expirado'
-        );
-    }
-    
-    echo json_encode($arr_Respuesta);
+         echo json_encode($arr_Respuesta);
 }
 
+if($tipo == "validar_datos_reset_password"){
+   $id_email = $_POST['id'];
+   $token_email = $_POST['token'];
 
+   $arr_Respuesta = array('status'=> false, 'msg'=>'link caducado');
+   $datos_usuario = $objUsuario->buscarUsuarioById($id_email);
+   if($datos_usuario->reset_password == 1 && password_verify($datos_usuario->token_password, $token_email)){
+     $arr_Respuesta = array('status'=> true, 'msg'=>'ok');
+   }
+   echo json_encode($arr_Respuesta);
+}
 if ($tipo == "listar_usuarios_ordenados_tabla") {
-
     $arr_Respuesta = array('status' => false, 'msg' => 'Error_Sesion');
     if ($objSesion->verificar_sesion_si_activa($id_sesion, $token)) {
         //print_r($_POST);
@@ -112,10 +106,7 @@ if ($tipo == "listar_usuarios_ordenados_tabla") {
     }
     echo json_encode($arr_Respuesta);
 }
-
-
-
- if ($tipo == "registrar") {
+if ($tipo == "registrar") {
     $arr_Respuesta = array('status' => false, 'msg' => 'Error_Sesion');
     if ($objSesion->verificar_sesion_si_activa($id_sesion, $token)) {
         //print_r($_POST);
@@ -125,9 +116,9 @@ if ($tipo == "listar_usuarios_ordenados_tabla") {
             $apellidos_nombres = $_POST['apellidos_nombres'];
             $correo = $_POST['correo'];
             $telefono = $_POST['telefono'];
-            $password = $_POST['password'];
+            $contraseniahash = password_hash($dni, PASSWORD_DEFAULT);
 
-            if ($dni == "" || $apellidos_nombres == "" || $correo == "" || $telefono == "" || $password == "") {
+            if ($dni == "" || $apellidos_nombres == "" || $correo == "" || $telefono == "") {
                 //repuesta
                 $arr_Respuesta = array('status' => false, 'mensaje' => 'Error, campos vacíos');
             } else {
@@ -135,7 +126,7 @@ if ($tipo == "listar_usuarios_ordenados_tabla") {
                 if ($arr_Usuario) {
                     $arr_Respuesta = array('status' => false, 'mensaje' => 'Registro Fallido, Usuario ya se encuentra registrado');
                 } else {
-                    $id_usuario = $objUsuario->registrarUsuario($dni, $apellidos_nombres, $correo, $telefono, $password);
+                    $id_usuario = $objUsuario->registrarUsuario($dni, $apellidos_nombres, $correo, $telefono,$contraseniahash);
                     if ($id_usuario > 0) {
                         // array con los id de los sistemas al que tendra el acceso con su rol registrado
                         // caso de administrador y director
@@ -209,202 +200,78 @@ if ($tipo == "reiniciar_password") {
     echo json_encode($arr_Respuesta);
 }
 
-if ($tipo == "sent_email_password") {
+if($tipo == "sent_email_password"){
+     $arr_Respuesta = array('status' => false, 'msg' => 'Error_Sesion');
+    if ($objSesion->verificar_sesion_si_activa($id_sesion, $token)) {
+            $datos_secion = $objSesion->buscarSesionLoginById($id_sesion);
+
+              //obtenemos los datos del usuario mediante el id de la sesion
+               $id_usuario = $datos_secion->id_usuario;
+               $datos_usuario = $objUsuario->buscarUsuarioById($id_usuario);
+               $correo_usuario = $datos_usuario->correo;
+               $nombre_usuario = $datos_usuario->nombres_apellidos;
+                
+                $llave = $objAdmin->generar_llave(30);
+                $token = password_hash($llave, PASSWORD_DEFAULT);
+                $update = $objUsuario->UpdateResetPassword($id_usuario,$llave,1);
+                if ($update) {
+                            //Create an instance; passing `true` enables exceptions
+                        //incluimos la plantilla de correo para el body email
+                        ob_start();
+                        include __DIR__ . '../../view/BodyEmail.php';
+                        $emailBody = ob_get_clean();
+                        
+                        //php mailer
+                        $mail = new PHPMailer(true);
+
+                        try {
+                            //Server settings
+                            $mail->SMTPDebug = 2;                      //Enable verbose debug output
+                            $mail->isSMTP();                                            //Send using SMTP
+                            $mail->Host       = 'mail.limon-cito.com';                     //Set the SMTP server to send through
+                            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+                            $mail->Username   = 'sisve_jota@limon-cito.com';                     //SMTP username
+                            $mail->Password   = 'jota123@@JOTA';                               //SMTP password
+                            $mail->SMTPSecure = 'ssl';            //Enable implicit TLS encryption
+                            $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+                            //Recipients
+                            $mail->setFrom('sisve_jota@limon-cito.com', 'Support Sisve app');
+                            $mail->addAddress($correo_usuario, $nombre_usuario);     //Add a recipient
+                            //Name is optional
+
+
+
+                            //Content
+                            $mail->isHTML(true);                                  //Set email format to HTML
+                            $mail->Subject = 'password reset request';
+
+        /*                   $file = fopen("../view/BodyEmail.php","r");
+                            $str = fread($file, filesize("../view/BodyEmail.php"));
+                            $str = trim($str);
+                            fclose($file); */
+
+                            $mail->Body    = $emailBody;
+                            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+                            $mail->send();
+                            echo 'Correo enviado con éxito.';
+                        } catch (Exception $e) {
+                            echo "Error al enviar: {$mail->ErrorInfo}";
+                        }
+                }else{
+                    echo "fallo";
+                }
+    }
+}
+if($tipo == "listarUsuarios"){
     $arr_Respuesta = array('status' => false, 'msg' => 'Error_Sesion');
-    if ($objSesion->verificar_sesion_si_activa($id_sesion, $token)) {   
-        $datos_sesion = $objSesion->buscarSesionLoginById($id_sesion);
-        $datos_usuario = $objUsuario->buscarUsuarioById($datos_sesion->id_usuario);
-        $nombreusuario = $datos_usuario->nombres_apellidos;
-        $llave = $objAdmin->generar_llave(30);
-        $token = password_hash($llave, PASSWORD_DEFAULT);
-        $update = $objUsuario->updateResetPassword($datos_sesion->id_usuario, $llave , 1);
-        if ($update) {
-            
+    if ($objSesion->verificar_sesion_si_activa($id_sesion, $token)) {
+   $arr_usuarios = $objUsuario->listarUsuarios();
 
-        //Import PHPMailer classes into the global namespace
-        //These must be at the top of your script, not inside a function
-
-        //Load Composer's autoloader (created by composer, not included with PHPMailer)
-        require '../../vendor/autoload.php';
-
-        //Create an instance; passing `true` enables exceptions
-        $mail = new PHPMailer(true);
-
-        try {
-            //Server settings
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
-            $mail->isSMTP();                                            //Send using SMTP
-            $mail->Host       = 'mail.limon-cito.com';                     //Set the SMTP server to send through
-            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-            $mail->Username   = 'josuegomezc21@limon-cito.com';                     //SMTP username
-            $mail->Password   = '1?rnmfHpzA&%';                               //SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-            $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-
-            //Recipients
-            $mail->setFrom('josuegomezc21@limon-cito.com', 'Cambio de Contraseña:');
-            $mail->addAddress($datos_usuario->correo, $datos_usuario->nombres_apellidos);     //Add a recipient
-           /* $mail->addAddress('ellen@example.com');               //Name is optional
-            $mail->addReplyTo('info@example.com', 'Information');
-            $mail->addCC('cc@example.com');
-            $mail->addBCC('bcc@example.com');
-
-            //Attachments
-            $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
-            $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
-            */
-            //Content
-            $mail->isHTML(true);    
-            $mail->CharSet = 'UTF-8';                              //Set email format to HTML
-            $mail->Subject = 'Cambio de contraseña - Sistema de Inventario';
-            $mail->Body    = '<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cambio de Contraseña - AriModas</title>
-  <style>
-    body, p, div, h1, h2, h3, a {
-      margin: 0;
-      padding: 0;
-      font-family: Tahoma, Geneva, Verdana, sans-serif;
-      color: #444444;
-      line-height: 1.6;
+   $arr_Respuesta['usuarios'] = $arr_usuarios;
+   $arr_Respuesta['status'] = true;
+   $arr_Respuesta['msg'] = 'correcto';
     }
-    body {
-      background-color: #f4f6f9;
-      -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-    }
-    a {
-      color: #2563eb;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.07);
-      border: 1px solid #e2e8f0;
-      overflow: hidden;
-    }
-    .header {
-      background: linear-gradient(90deg,rgb(243, 243, 243) 0%, #2563eb 100%);
-      padding: 30px;
-      text-align: center;
-      color: white;
-    }
-    .header img {
-      max-width: 100px;
-      margin-bottom: 10px;
-     
-    }
-    .header h1 {
-      font-weight: 700;
-      font-size: 24px;
-      margin-top: 10px;
-    }
-    .body {
-      padding: 35px 30px 40px;
-      font-size: 16px;
-      color: #555555;
-    }
-    .body h2 {
-      font-weight: 600;
-      font-size: 22px;
-      margin-bottom: 18px;
-      color: #222222;
-    }
-    .body p {
-      margin-bottom: 18px;
-    }
-    .btn-primary {
-      display: inline-block;
-      background-color:rgb(152, 189, 250);
-      color: #fff !important;
-      padding: 14px 28px;
-      font-weight: 600;
-      border-radius: 8px;
-      font-size: 16px;
-      margin: 25px 0;
-      text-align: center;
-      box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
-      transition: background-color 0.3s ease;
-    }
-    .btn-primary:hover {
-      background-color: #1d4ed8;
-    }
-    .footer {
-      background-color: #f1f5f9;
-      padding: 20px 30px;
-      font-size: 13px;
-      text-align: center;
-      color: #888888;
-      border-top: 1px solid #e2e8f0;
-    }
-    .footer a {
-      color: #3b82f6;
-    }
-    @media screen and (max-width: 620px) {
-      .container {
-        width: 95% !important;
-        margin: 15px auto;
-        border-radius: 8px;
-      }
-      .body {
-        padding: 25px 20px 30px;
-        font-size: 15px;
-      }
-      .btn-primary {
-        width: 100%;
-        box-sizing: border-box;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container" style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-    <!-- Header -->
-    <div class="header" style="text-align: center; padding: 20px 0;">
-   <img src="https://drive.google.com/uc?export=dowload&id=1zMqvObW5v16DEPqAdJO-M6QeHa9Oh3Wk" alt="Logo AriModas" style="width: 100px;">
-      <h1 style="margin: 0; color: #333;">AriModas</h1>
-    </div>
-    <!-- Body -->
-    <div class="body" style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
-      <h2 >Hola, '.$nombreusuario.' 👋</h2>
-      <p>Hemos recibido una solicitud para cambiar tu contraseña. Si fuiste tú quien hizo esta solicitud, puedes continuar el proceso haciendo clic en el botón a continuación.</p>
-      <p>Por seguridad, este enlace solo estará disponible durante las próximas 24 horas. Si no realizaste esta solicitud, puedes ignorar este mensaje sin problemas.</p>
-
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="' . BASE_URL . 'reset-password/?data=' . $datos_usuario->id . '&data2=' . urlencode($token) . '" class="button">cambiar contraseña </a>
-      </div>  
-
-      <p>Gracias por confiar en nosotros.<br>— El equipo de <strong>AriModas</strong></p>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer" style="text-align: center; font-size: 13px; color: #888; margin-top: 20px;">
-      <p>© 2025 AriModas. Todos los derechos reservados.</p>
-    </div>
-  </div>
-</body>
-
-</html>
-';
-
-            $mail->send();
-            echo 'Message has been sent';
-        } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-        }
-            
-        }else {
-            echo "fallo al actualizar";
-        }
-        //print_r($token);
-    }
+    echo json_encode($arr_Respuesta);
 }

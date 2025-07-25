@@ -6,7 +6,7 @@
                 <div class="page-title-box d-flex align-items-center justify-content-between p-0">
                     <h4 class="mb-0 font-size-18">Movimientos</h4>
                     <div class="page-title-right">
-                        <a href="<?php echo BASE_URL; ?>nuevo-movimiento" class="btn btn-success waves-effect waves-light">+ Nuevo</a>
+                        <a href="<?php echo BASE_URL; ?>nuevo-movimiento" class="btn btn-primary waves-effect waves-light">+ Nuevo</a>
                     </div>
                 </div>
             </div>
@@ -54,6 +54,7 @@
         </div>
         <div class="card">
             <div class="card-body">
+                 <a href="<?php BASE_URL;?>imprimir-pdfs/imprMovimientos" class="btn btn-danger" title="REPORTE GENERAL" ><i class="fa fa-file-pdf"></i></a>
                 <h4 class="card-title">Resultados de Búsqueda</h4>
                 <div id="filtros_tabla_header" class="form-group  row page-title-box d-flex align-items-center justify-content-between m-0 mb-1 p-0">
                     <input type="hidden" id="pagina" value="1">
