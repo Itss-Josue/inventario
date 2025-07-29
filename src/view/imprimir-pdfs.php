@@ -1291,7 +1291,14 @@ function generarHTMLReporteUsuarios($usuarios) {
     .col-registro { width: 11%; }
 </style>
 
+<div class="espaciado-superior">
+    <div class="titulo-reporte"></div>
+    <div class="titulo-reporte"></div>
+    <div class="titulo-reporte"></div>
+
     <div class="titulo-reporte"> Reporte de Usuarios</div>
+
+
 
     <div class="report-info">
         <div>Generado: ' . $fechaHora . '</div>
