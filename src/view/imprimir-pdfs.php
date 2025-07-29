@@ -29,16 +29,6 @@ class MYPDF extends TCPDF {
         $this->SetFont('helvetica', '', 9);
         $this->Cell(0, 5, 'DIRECCIÓN DE ADMINISTRACIÓN', 0, 1, 'C');
 
-        // LÍNEAS
-        $lineWidth = 140;
-        $pageWidth = $this->getPageWidth();
-        $x = ($pageWidth - $lineWidth) / 2;
-        $y1 = 29;
-        $this->SetFillColor(41, 91, 162);
-        $this->Rect($x, $y1, $lineWidth, 0.5, 'F');
-        $y2 = $y1 + 1.2;
-        $this->SetFillColor(51, 116, 194);
-        $this->Rect($x, $y2, $lineWidth, 1, 'F');
 
         // LOGO DERECHO
         if ($image_path_der && file_exists($image_path_der)) {
@@ -61,166 +51,144 @@ class MYPDF extends TCPDF {
     }
 }
 
-
+// imprimir instituciones
 if ($ruta[1] == "imprInstituciones") {
-    $curl = curl_init(); //inicia la sesión cURL
+    $curl = curl_init();
     curl_setopt_array($curl, array(
         CURLOPT_URL => BASE_URL_SERVER."src/control/Institucion.php?tipo=listar&sesion=".$_SESSION['sesion_id']."&token=".$_SESSION['sesion_token'],
-        CURLOPT_RETURNTRANSFER => true, //devuelve el resultado como una cadena del tipo curl_exec
-        CURLOPT_FOLLOWLOCATION => true, //sigue el encabezado que le envíe el servidor
-        CURLOPT_ENCODING => "", // permite decodificar la respuesta y puede ser"identity", "deflate", y "gzip", si está vacío recibe todos los disponibles.
-        CURLOPT_MAXREDIRS => 10, // Si usamos CURLOPT_FOLLOWLOCATION le dice el máximo de encabezados a seguir
-        CURLOPT_TIMEOUT => 30, // Tiempo máximo para ejecutar
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, // usa la versión declarada
-        CURLOPT_CUSTOMREQUEST => "GET", // el tipo de petición, puede ser PUT, POST, GET o Delete dependiendo del servicio
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "GET",
         CURLOPT_HTTPHEADER => array(
             "x-rapidapi-host: ".BASE_URL_SERVER,
             "x-rapidapi-key: XXXX"
-        ), 
-    )); 
-    $response = curl_exec($curl); 
-    $err = curl_error($curl); 
-    curl_close($curl); 
+        ),
+    ));
+
+    $response = curl_exec($curl);
+    $err = curl_error($curl);
+    curl_close($curl);
+
     if ($err) {
-        echo "cURL Error #:" . $err; 
+        echo "cURL Error #:" . $err;
     } else {
-       $respuesta = json_decode($response);
+        $respuesta = json_decode($response);
+        $instituciones = $respuesta->contenido;
 
-       $instituciones = $respuesta->contenido;
-
-               // datos para la fechas
         $new_Date = new DateTime();
         $dia = $new_Date->format('d');
         $año = $new_Date->format('Y');
-        $mesNumero = (int)$new_Date->format('n'); 
-        $meses = [1 => 'Enero',2 => 'Febrero',3 => 'Marzo', 4 => 'Abril',5 => 'Mayo', 6 => 'Junio', 7 => 'Julio',8 => 'Agosto',9 => 'Septiembre',10 => 'Octubre',11 => 'Noviembre', 12 => 'Diciembre'];
+        $mesNumero = (int)$new_Date->format('n');
+        $meses = [1 => 'Enero',2 => 'Febrero',3 => 'Marzo',4 => 'Abril',5 => 'Mayo',6 => 'Junio',7 => 'Julio',8 => 'Agosto',9 => 'Septiembre',10 => 'Octubre',11 => 'Noviembre',12 => 'Diciembre'];
 
-       $contenido_pdf = '';
+        $contenido_pdf = '
+        <style>
+            h2 {
+                text-align: center;
+                text-transform: uppercase;
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 10px;
+                margin-top: 10px;
+            }
+            th {
+                background-color: #f0f0f0;
+                font-weight: bold;
+            }
+            th, td {
+                border: 1px solid #333;
+                padding: 5px;
+                text-align: center;
+            }
+            .fecha {
+                text-align: right;
+                font-size: 11px;
+                margin-top: 30px;
+            }
+            .firmas {
+                margin-top: 50px;
+                width: 100%;
+            }
+            .firmas td {
+                width: 50%;
+                text-align: center;
+                border: none;
+                padding-top: 40px;
+            }
+        </style>
 
-       $contenido_pdf .= '<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Papeleta de Rotación de instituciones</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-    }
-    h2 {
-      text-align: center;
-      text-transform: uppercase;
-    }
-    .info {
-      margin-bottom: 20px;
-      line-height: 1.8;
-    }
-    .info b {
-      display: inline-block;
-      width: 80px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      font-size:9px;
-    }
-    th, td {
-      border: 1px solid black;
-      text-align: center;
-      padding: 6px;
-    }
-    .fecha {
-      margin-top: 30px;
-      text-align: right;
-    }
+        <h2>REPORTE DE INSTITUCIONES</h2>
 
-    .firma-section tr td{
-       border: none;
-      }
-
-  </style>
-</head>
-<body>
-
-  <h2>REPORTE DE INSTITUCIONES</h2>
-
-  <table>
-    <thead>
-      <tr>
-        <th>ITEM</th>
-        <th>BENEFICIARIO</th>
-        <th>CODIGO MODULAR</th>
-        <th>RUC</th>
-        <th>NOMBRE</th>
-      </tr>
-    </thead>
-    <tbody>';    
-         $contador = 1;
+        <table>
+            <thead>
+                <tr>
+                    <th>ITEM</th>
+                    <th>BENEFICIARIO</th>
+                    <th>COD. MODULAR</th>
+                    <th>RUC</th>
+                    <th>NOMBRE</th>
+                </tr>
+            </thead>
+            <tbody>';
+            
+        $contador = 1;
         foreach ($instituciones as $institucion) {
-             $contenido_pdf .= '<tr>';
-             $contenido_pdf .=  "<td>".  $contador . "</td>";
-             $contenido_pdf .=  "<td>".  $institucion->beneficiario . "</td>";
-             $contenido_pdf .= "<td>" .  $institucion->cod_modular . "</td>";
-             $contenido_pdf .=  "<td>".  $institucion->ruc . "</td>";
-             $contenido_pdf .=  "<td>".  $institucion->nombre. "</td>";
-             $contenido_pdf .=  '</tr>';
-             $contador ++;
+            $contenido_pdf .= '
+                <tr>
+                    <td>'.$contador.'</td>
+                    <td>'.$institucion->beneficiario.'</td>
+                    <td>'.$institucion->cod_modular.'</td>
+                    <td>'.$institucion->ruc.'</td>
+                    <td>'.$institucion->nombre.'</td>
+                </tr>';
+            $contador++;
         }
- $contenido_pdf .='  </tbody>
-  </table> 
 
-  <div class="fecha">
-    Ayacucho, '. $dia . " de " . $meses[$mesNumero] . " del " . $año.'
-  </div>
-<table  class="firma-section">
-  <tr>
-  <td>
-    <div>
-      ------------------------------<br>
-      ENTREGUÉ CONFORME
-    </div>
-    </td>
-    <td>
-    <div>
-      ------------------------------<br>
-      RECIBÍ CONFORME
-    </div>
-    </td>
-   </tr>
-  </table>
+        $contenido_pdf .= '
+            </tbody>
+        </table>
 
-</body>
-</html>';
+        <div class="fecha">
+            Ayacucho, '.$dia.' de '.$meses[$mesNumero].' del '.$año.'
+        </div>
 
+        <table class="firmas">
+            <tr>
+                <td>
+                    ____________________________<br>
+                    ENTREGUÉ CONFORME
+                </td>
+                <td>
+                    ____________________________<br>
+                    RECIBÍ CONFORME
+                </td>
+            </tr>
+        </table>';
+
+        // Generar PDF
         $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-
-        // set document information
         $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Juan Elias');
+        $pdf->SetAuthor('Sistema de Gestión');
         $pdf->SetTitle('REPORTE DE INSTITUCIONES');
-        $pdf->SetSubject('TCPDF Tutorial');
-        $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
-        // set margins
         $pdf->SetMargins(PDF_MARGIN_LEFT, 48, PDF_MARGIN_RIGHT);
         $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
         $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        //ASIGNAR SALTO DE PAGINA AUTO
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        // add a page
         $pdf->AddPage();
-        // output the HTML content
-        $pdf->writeHTML($contenido_pdf, true, false,true,false,'');
-
-        //Close and output PDF document
+        $pdf->writeHTML($contenido_pdf, true, false, true, false, '');
         $pdf->Output('REPORTE_INSTITUCIONES.pdf', 'I');
-
         exit;
-
     }
-
-
 }
+
 
 // Imprimir reporte de ambientes
 if ($ruta[1] == "imprAmbientes") {
@@ -627,7 +595,7 @@ if ($ruta[1] == "imprBienes") {
 
         $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Juan Elias');
+        $pdf->SetAuthor('Sistema de Gestión');
         $pdf->SetTitle('REPORTE DE BIENES');
         $pdf->SetSubject('Reporte');
         $pdf->SetKeywords('TCPDF, PDF, bienes, reporte');
@@ -929,17 +897,10 @@ function generarHTMLReporteMovimientos($movimientos) {
                 letter-spacing: 0.5px;
             }
 
-            /* Anchos de columnas optimizados */
-            .col-numero { width: 5%; }
-            .col-origen { width: 20%; }
-            .col-destino { width: 18%; }
-            .col-usuario { width: 14%; }
-            .col-fecha { width: 10%; }
-            .col-descripcion { width: 25%; }
-            .col-institucion { width: 8%; }
         </style>
     </head>
     <body>
+
         <div class="header">
             <h1>Reporte de Movimientos</h1>
             <div class="subtitle">Control de Traslados de Ambientes</div>
@@ -1177,214 +1138,184 @@ function generarHTMLReporteUsuarios($usuarios) {
     $totalUsuarios = count($usuarios);
     
     $html = '
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <title>Reporte de Usuarios</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+<style>
+    body {
+        font-family: "Arial", sans-serif;
+        font-size: 10px;
+        color: #1f2937;
+        line-height: 1.4;
+    }
 
-            body {
-                font-family: "Arial", sans-serif;
-                font-size: 10px;
-                color: #1f2937;
-                padding: 15px;
-                background-color: #ffffff;
-                line-height: 1.4;
-            }
+    .espaciado-superior {
+        margin-top: 250px; /* Ajustado */
+        text-align: center;
+    }
 
-            .header {
-                text-align: center;
-                margin-bottom: 20px;
-                padding: 15px 0;
-                border-bottom: 3px solid #3b82f6;
-                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-                border-radius: 8px 8px 0 0;
-            }
+    .titulo-reporte {
+        font-size: 18px;
+        font-weight: bold;
+        color: #1e3a8a;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
 
-            .header h1 {
-                font-size: 18px;
-                font-weight: 700;
-                color: #1e40af;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-            }
+    .report-info {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #0ea5e9;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10px;
+    }
 
-            .report-info {
-                background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-                padding: 12px 15px;
-                border-radius: 8px;
-                border-left: 4px solid #0ea5e9;
-                margin-bottom: 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            }
+    .summary-stats {
+        font-size: 11px;
+        font-weight: 700;
+        color: #0369a1;
+        background: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
 
-            .report-meta {
-                font-size: 10px;
-                color: #475569;
-                font-weight: 500;
-            }
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+    }
 
-            .summary-stats {
-                font-size: 11px;
-                font-weight: 700;
-                color: #0369a1;
-                background: white;
-                padding: 4px 8px;
-                border-radius: 4px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
+    .main-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8px;
+    }
 
-            .table-container {
-                background: white;
-                border-radius: 10px;
-                overflow: hidden;
-                border: 1px solid #e2e8f0;
-                margin-bottom: 20px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            }
+    .main-table thead th {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        font-weight: 600;
+        padding: 8px 5px;
+        text-align: center;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-            .main-table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 8px;
-            }
+    .main-table tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
 
-            .main-table thead th {
-                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-                color: white;
-                font-weight: 600;
-                padding: 10px 6px;
-                text-align: center;
-                font-size: 9px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
+    .main-table tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+    }
 
-            .main-table tbody tr {
-                transition: background-color 0.2s ease;
-            }
+    .main-table tbody td {
+        padding: 7px 5px;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+        font-size: 8px;
+    }
 
-            .main-table tbody tr:nth-child(even) {
-                background-color: #f8fafc;
-            }
+    .status-active {
+        background-color: #dcfce7;
+        color: #166534;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 7px;
+    }
 
-            .main-table tbody tr:nth-child(odd) {
-                background-color: #ffffff;
-            }
+    .status-inactive {
+        background-color: #fee2e2;
+        color: #991b1b;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 7px;
+    }
 
-            .main-table tbody td {
-                padding: 8px 6px;
-                text-align: center;
-                border-bottom: 1px solid #e2e8f0;
-                vertical-align: middle;
-                font-size: 8px;
-            }
+    .fecha-generacion {
+        text-align: right;
+        font-size: 10px;
+        color: #64748b;
+        font-style: italic;
+        margin-top: 25px;
+        font-weight: 500;
+    }
 
-            .status-active {
-                background-color: #dcfce7;
-                color: #166534;
-                padding: 2px 6px;
-                border-radius: 12px;
-                font-weight: 600;
-                font-size: 7px;
-            }
+    .firmas-section {
+        margin-top: 40px;
+        width: 100%;
+    }
 
-            .status-inactive {
-                background-color: #fee2e2;
-                color: #991b1b;
-                padding: 2px 6px;
-                border-radius: 12px;
-                font-weight: 600;
-                font-size: 7px;
-            }
+    .firma-container {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-            .fecha-generacion {
-                text-align: right;
-                font-size: 10px;
-                color: #64748b;
-                font-style: italic;
-                margin-top: 25px;
-                font-weight: 500;
-            }
+    .firma-box {
+        text-align: center;
+        padding: 20px 10px;
+        width: 50%;
+        font-size: 10px;
+        border: none;
+    }
 
-            .firmas-section {
-                margin-top: 40px;
-                width: 100%;
-            }
+    .firma-line {
+        border-bottom: 2px solid #374151;
+        width: 180px;
+        margin: 0 auto 12px auto;
+        height: 1px;
+    }
 
-            .firma-container {
-                width: 100%;
-                border-collapse: collapse;
-            }
+    .firma-text {
+        font-weight: 600;
+        color: #4b5563;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-            .firma-box {
-                text-align: center;
-                padding: 20px 10px;
-                width: 50%;
-                font-size: 10px;
-                border: none;
-            }
+    .col-numero { width: 5%; }
+    .col-dni { width: 12%; }
+    .col-nombres { width: 25%; }
+    .col-correo { width: 25%; }
+    .col-telefono { width: 12%; }
+    .col-estado { width: 10%; }
+    .col-registro { width: 11%; }
+</style>
 
-            .firma-line {
-                border-bottom: 2px solid #374151;
-                width: 180px;
-                margin: 0 auto 12px auto;
-                height: 1px;
-            }
+    <div class="titulo-reporte"> Reporte de Usuarios</div>
 
-            .firma-text {
-                font-weight: 600;
-                color: #4b5563;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .col-numero { width: 5%; }
-            .col-dni { width: 12%; }
-            .col-nombres { width: 25%; }
-            .col-correo { width: 25%; }
-            .col-telefono { width: 12%; }
-            .col-estado { width: 10%; }
-            .col-registro { width: 11%; }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>Reporte de Usuarios</h1>
+    <div class="report-info">
+        <div>Generado: ' . $fechaHora . '</div>
+        <div class="summary-stats">
+            Total: <strong>' . $totalUsuarios . ' usuarios</strong>
         </div>
+    </div>
 
-        <div class="report-info">
-            <div class="report-meta">
-                <span>📅 Generado: ' . $fechaHora . '</span>
-            </div>
-            <div class="summary-stats">
-                <span>👥 Total: <strong>' . $totalUsuarios . ' usuarios</strong></span>
-            </div>
-        </div>
+    <div class="table-container">
+        <table class="main-table">
+            <thead>
+                <tr>
+                    <th class="col-numero">N°</th>
+                    <th class="col-dni">DNI</th>
+                    <th class="col-nombres">Nombres y Apellidos</th>
+                    <th class="col-correo">Correo Electrónico</th>
+                    <th class="col-telefono">Teléfono</th>
+                    <th class="col-estado">Estado</th>
+                    <th class="col-registro">Fecha Registro</th>
+                </tr>
+            </thead>
+            <tbody>';
 
-        <div class="table-container">
-            <table class="main-table">
-                <thead>
-                    <tr>
-                        <th class="col-numero">N°</th>
-                        <th class="col-dni">DNI</th>
-                        <th class="col-nombres">Nombres y Apellidos</th>
-                        <th class="col-correo">Correo Electrónico</th>
-                        <th class="col-telefono">Teléfono</th>
-                        <th class="col-estado">Estado</th>
-                        <th class="col-registro">Fecha Registro</th>
-                    </tr>
-                </thead>
-                <tbody>';
+
 
     // Generar filas de datos
     $contador = 1;
