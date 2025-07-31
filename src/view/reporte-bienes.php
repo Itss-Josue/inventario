@@ -1,128 +1,104 @@
+<?php
+require './vendor/autoload.php';
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-<?php 
+session_start(); // Asegura que $_SESSION esté disponible
 
-    require './vendor/autoload.php';
+$curl = curl_init();
+curl_setopt_array($curl, array(
+    CURLOPT_URL => BASE_URL_SERVER."src/control/Bien.php?tipo=ObtenerTodosBienes&sesion=".$_SESSION['sesion_id']."&token=".$_SESSION['sesion_token'],
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => "GET",
+));
 
-    use PhpOffice\PhpSpreadsheet\Spreadsheet;
-    use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-  
+$response = curl_exec($curl);
+$err = curl_error($curl);
+curl_close($curl);
 
+if ($err) {
+    echo "cURL Error #:" . $err;
+    exit;
+}
 
+$respuesta = json_decode($response);
+if (!$respuesta || !$respuesta->status) {
+    echo "Error al obtener los bienes.";
+    exit;
+}
 
-$curl = curl_init(); //inicia la sesión cURL
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => BASE_URL_SERVER."src/control/Bien.php?tipo=listarBienes&sesion=".$_SESSION['sesion_id']."&token=".$_SESSION['sesion_token'], //url a la que se conecta
-        CURLOPT_RETURNTRANSFER => true, //devuelve el resultado como una cadena del tipo curl_exec
-        CURLOPT_FOLLOWLOCATION => true, //sigue el encabezado que le envíe el servidor
-        CURLOPT_ENCODING => "", // permite decodificar la respuesta y puede ser"identity", "deflate", y "gzip", si está vacío recibe todos los disponibles.
-        CURLOPT_MAXREDIRS => 10, // Si usamos CURLOPT_FOLLOWLOCATION le dice el máximo de encabezados a seguir
-        CURLOPT_TIMEOUT => 30, // Tiempo máximo para ejecutar
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, // usa la versión declarada
-        CURLOPT_CUSTOMREQUEST => "GET", // el tipo de petición, puede ser PUT, POST, GET o Delete dependiendo del servicio
-        CURLOPT_HTTPHEADER => array(
-            "x-rapidapi-host: ".BASE_URL_SERVER,
-            "x-rapidapi-key: XXXX"
-        ), //configura las cabeceras enviadas al servicio
-    )); //curl_setopt_array configura las opciones para una transferencia cURL
+$bienes = $respuesta->bienes;
 
-    $response = curl_exec($curl); // respuesta generada
-    $err = curl_error($curl); // muestra errores en caso de existir
+// Crear Excel
+$spreadsheet = new Spreadsheet();
+$spreadsheet->getProperties()
+    ->setCreator("Sistema")
+    ->setLastModifiedBy("Sistema")
+    ->setTitle("Reporte de Bienes")
+    ->setDescription("Listado de bienes registrados");
 
-    curl_close($curl); // termina la sesión 
+$sheet = $spreadsheet->getActiveSheet();
+$sheet->setTitle("Bienes");
 
-    if ($err) {
-        echo "cURL Error #:" . $err; // mostramos el error
-    } else {
-       $respuesta = json_decode($response);
+// Estilos
+$styleHeader = ['font' => ['bold' => true]];
+$sheet->getStyle('A1:S1')->applyFromArray($styleHeader);
 
-       $bienes = $respuesta->bienes;
+// Encabezados
+$headers = [
+    'ID', 'Ingreso', 'Ambiente', 'Código Patrimonial', 'Denominación', 'Marca', 'Modelo', 'Tipo', 'Color',
+    'Serie', 'Dimensiones', 'Valor', 'Situación', 'Estado Conservación', 'Observaciones',
+    'Fecha Registro', 'Usuario Registro', 'Estado'
+];
 
+foreach ($headers as $i => $header) {
+    $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i + 1);
+    $sheet->setCellValue($col . '1', $header);
+}
 
-       // Crear el Excel
-            $spreadsheet = new Spreadsheet();
-            $spreadsheet->getProperties()->setCreator("JUAN")->setLastModifiedBy("yo")->setTitle("ReporteBienes")->setDescription("yo");
-            $activeWorkSheet = $spreadsheet->getActiveSheet();
-            $activeWorkSheet->setTitle("Bienes");  
+// Datos
+$row = 2;
+foreach ($bienes as $bien) {
+    $datos = [
+        $bien->id ?? '',
+        $bien->ingresonombre ?? '',
+        $bien->ambiente ?? '',
+        $bien->cod_patrimonial ?? '',
+        $bien->denominacion ?? '',
+        $bien->marca ?? '',
+        $bien->modelo ?? '',
+        $bien->tipo ?? '',
+        $bien->color ?? '',
+        $bien->serie ?? '',
+        $bien->dimensiones ?? '',
+        $bien->valor ?? '',
+        $bien->situacion ?? '',
+        $bien->estado_conservacion ?? '',
+        $bien->observaciones ?? '',
+        $bien->fecha_registro ?? '',
+        $bien->usuarioregistro ?? '',
+        $bien->estado ?? ''
+    ];
 
-            // Estilo en negrita
-            $styleArray = [
-                'font' => [
-                    'bold' => true,
-                ]
-            ];
+    foreach ($datos as $i => $valor) {
+        $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i + 1);
+        $sheet->setCellValue($col . $row, $valor);
+    }
 
-            // Aplica negrita a la fila 1 (de A1 a R1 si son 18 columnas)
-            $activeWorkSheet->getStyle('A1:R1')->applyFromArray($styleArray);
-            
-            $headers = [
-                'ID', 'Id ingreso bienes', 'id ambiente', 'cod patrimonial', 'denominacion', 'marca', 'Modelo', 'tipo', 'Color',
-                'serie', 'dimensiones', 'valor', 'situacion', 'estado conservacion', 'observaciones',
-                'fecha registro', 'usuario registro', 'estado'
-             ];
+    $row++;
+}
 
-            // Asignar cabeceras en la fila 1
-            foreach ($headers as $i => $header) {
-                $columna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i + 1);
-                $activeWorkSheet->setCellValue($columna . '1', $header);
-            }
+// Salida
+ob_clean(); // Limpia buffer para evitar errores en descarga
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header('Content-Disposition: attachment; filename="reporte_bienes.xlsx"');
+header('Cache-Control: max-age=0');
 
-           // Llenar los datos
-            $row = 2;
-            foreach ($bienes as $bien) {
-                $atributos = [
-                    $bien->id ?? '',
-                    $bien->id_ingreso_bienes ?? '',
-                    $bien->id_ambiente ?? '',
-                    $bien->cod_patrimonial ?? '',
-                    $bien->denominacion ?? '',
-                    $bien->marca ?? '',
-                    $bien->modelo ?? '',
-                    $bien->tipo ?? '',
-                    $bien->color ?? '',
-                    $bien->serie ?? '',
-                    $bien->dimensiones ?? '',
-                    $bien->valor ?? '',
-                    $bien->situacion ?? '',
-                    $bien->estado_conservacion ?? '',
-                    $bien->observaciones ?? '',
-                    $bien->fecha_registro ?? '',
-                    $bien->usuario_registro ?? '',
-                    $bien->estado ?? ''
-                ];
-
-                foreach ($atributos as $i => $valor) {
-                    $columna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i + 1);
-                    $activeWorkSheet->setCellValue($columna . $row, $valor);
-                }
-
-                $row++;
-            }
-
-
-ob_clean();
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment; filename="reporte_bienes.xlsx"');
-            header('Cache-Control: max-age=0');
-
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-            exit;
-
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+$writer = new Xlsx($spreadsheet);
+$writer->save('php://output');
+exit;
