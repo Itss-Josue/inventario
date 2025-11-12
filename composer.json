@@ -1,10 +1,10 @@
 {
-    "name": "yucra/sigi",
-    "description": "sistema integrado de gestion institucional IES PERU",
+    "name": "josue/webcon",
+    "description": "sistema integrado de gestion de proyectos",
     "type": "project",
     "autoload": {
         "psr-4": {
-            "Yucra\\Sigi\\": "src/"
+            "Gomez\\webcon\\": "src/"
         }
     },
     "authors": [

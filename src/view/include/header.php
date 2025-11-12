@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>SIGI - IES</title>
+    <title>WEBCON</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta content="Sistema Integrado de Gestión Institucional" name="description" />
     <meta content="AnibalYucraC" name="author" />
@@ -52,7 +52,7 @@
                         <a href="<?php echo BASE_URL ?>" class="logo">
                             <i class="mdi mdi-album"></i>
                             <span>
-                                SISTEMA DE GESTION DE INVENTARIO
+                                SISTEMA DE GESTION DE PROYECTOS
                             </span>
                         </a>
 
@@ -113,12 +113,12 @@
                                         <i class="mdi mdi-diamond-stone"></i>Gestión <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-components">
-                                        <a href="<?php echo BASE_URL ?>usuarios" class="dropdown-item">Usuarios</a>
-                                        <a href="<?php echo BASE_URL ?>instituciones" class="dropdown-item">Instituciones</a>
-                                        <a href="<?php echo BASE_URL ?>ambientes" class="dropdown-item">Ambientes</a>
-                                        <a href="<?php echo BASE_URL ?>bienes" class="dropdown-item">Bienes</a>
-                                        <a href="<?php echo BASE_URL ?>movimientos" class="dropdown-item">Movimientos</a>
+                                        <a href="<?php echo BASE_URL ?>clientes" class="dropdown-item">Clientes</a>
+                                        <a href="<?php echo BASE_URL ?>proyectos" class="dropdown-item">Proyectos</a>
+                                        <a href="<?php echo BASE_URL ?>clientes-api" class="dropdown-item">Cliente Api</a>
+                                        <a href="<?php echo BASE_URL ?>tokens-api" class="dropdown-item">Token Api</a>
                                         <a href="<?php echo BASE_URL ?>reportes" class="dropdown-item">Reportes</a>
+
                                     </div>
                                 </li>
 

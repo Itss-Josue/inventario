@@ -69,9 +69,9 @@
             <div class="icon-circle bg-success mx-auto mb-3">
                 <i class="fa fa-university"></i>
             </div>
-            <div class="glass-title">Instituciones</div>
+            <div class="glass-title">Clientes</div>
             <div class="glass-value">10</div>
-            <a href="#" class="btn btn-glass mt-3">Ver</a>
+            <a href="<?php echo BASE_URL ?>clientes" class="dropdown-item">Ver</a>
         </div>
     </div>
 
@@ -81,9 +81,9 @@
             <div class="icon-circle bg-warning mx-auto mb-3">
                 <i class="fa fa-building"></i>
             </div>
-            <div class="glass-title">Ambientes</div>
-            <div class="glass-value">200</div>
-            <a href="#" class="btn btn-glass mt-3">Ver</a>
+            <div class="glass-title">Proyectos</div>
+            <div class="glass-value">20</div>
+            <a href="<?php echo BASE_URL ?>proyectos" class="dropdown-item">Ver</a>
         </div>
     </div>
 
@@ -93,9 +93,9 @@
             <div class="icon-circle bg-info mx-auto mb-3">
                 <i class="fa fa-cogs"></i>
             </div>
-            <div class="glass-title">Bienes</div>
-            <div class="glass-value">15890</div>
-            <a href="#" class="btn btn-glass mt-3">Ver</a>
+            <div class="glass-title">Token Api</div>
+            <div class="glass-value">4</div>
+           <a href="<?php echo BASE_URL ?>tokens-api" class="dropdown-item">Ver</a>
         </div>
     </div>
 
@@ -105,9 +105,9 @@
             <div class="icon-circle bg-danger mx-auto mb-3">
                 <i class="fa fa-exchange-alt"></i>
             </div>
-            <div class="glass-title">Movimientos</div>
-            <div class="glass-value">20</div>
-            <a href="#" class="btn btn-glass mt-3">Ver</a>
+            <div class="glass-title">Cliente Api</div>
+            <div class="glass-value">7</div>
+            <a href="<?php echo BASE_URL ?>clientes-api" class="dropdown-item">Ver</a>
         </div>
     </div>
 
@@ -118,8 +118,8 @@
                 <i class="fa fa-file-alt"></i>
             </div>
             <div class="glass-title">Reportes</div>
-            <div class="glass-value">01/04/2024</div>
-            <a href="#" class="btn btn-glass mt-3">Ver</a>
+            <div class="glass-value">01/04/2025</div>
+            <a href="<?php echo BASE_URL ?>reportes" class="dropdown-item">Ver</a>
         </div>
     </div>
 
